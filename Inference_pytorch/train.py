@@ -11,14 +11,14 @@ from utee import wage_util
 from datetime import datetime
 from utee import wage_quantizer
 from torchsummary import summary
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR-X Example')
 parser.add_argument('--dataset', default='cifar10', help='cifar10|cifar100|imagenet')
 parser.add_argument('--model', default='MobileNetV1', help='VGG8|DenseNet40|ResNet18|MobileNetV1|DSnet')
 parser.add_argument('--mode', default='FP', help='WAGE|FP')
 parser.add_argument('--batch_size', type=int, default=128, help='input batch size for training (default: 64)')
-parser.add_argument('--epochs', type=int, default=500, help='number of epochs to train (default: 10)')
+parser.add_argument('--epochs', type=int, default=20, help='number of epochs to train (default: 10)')
 parser.add_argument('--grad_scale', type=float, default=8, help='learning rate for wage delta calculation')
 parser.add_argument('--seed', type=int, default=117, help='random seed (default: 1)')
 parser.add_argument('--log_interval', type=int, default=100,  help='how many batches to wait before logging training status')
@@ -75,7 +75,7 @@ elif args.dataset == 'imagenet':
 else:
     raise ValueError("Unknown dataset type")
     
-assert args.model in ['VGG8', 'DenseNet40', 'ResNet18','MobileNetV1','DSnet'], args.model
+assert args.model in ['VGG8', 'DenseNet40', 'ResNet18','MobileNetV1','DSnet','DSCnet','FuseNet'], args.model
 if args.model == 'VGG8':
     from models import VGG
     model = VGG.vgg8(args = args, logger=logger)
@@ -93,12 +93,23 @@ elif args.model == 'DSnet':
     model = DSnet.MobileNet(class_num=10,args = args, logger=logger)
     print(model)
     criterion = torch.nn.CrossEntropyLoss()
+elif args.model == 'DSCnet':
+    from models import DSCnet
+    model = DSCnet.MobileNet(class_num=10,args = args, logger=logger)
+    print(model)
+    criterion = torch.nn.CrossEntropyLoss()
 elif args.model == 'MobileNetV1':
     from models import mobilenetv1
     model = mobilenetv1.MobileNetV1(num_classes=10, args= args, logger=logger)
     # model = mobilenetv1.MobileNetV1(num_classes=10, args=args, logger=logger)
+    print(model)
     criterion = torch.nn.CrossEntropyLoss()
-
+elif args.model == 'FuseNet':
+    from models import FuseNet
+    # model = FuseNet.MobileNetV1FuSeFull(num_classes=10, args= args, logger=logger)
+    model = FuseNet.MobileNetV1FuSeHalf(num_classes=10, args= args, logger=logger)
+    print(model)
+    criterion = torch.nn.CrossEntropyLoss()
 else:
     raise ValueError("Unknown model type")
 

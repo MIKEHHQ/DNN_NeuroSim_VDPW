@@ -82,7 +82,7 @@ elif args.dataset == 'imagenet':
 else:
     raise ValueError("Unknown dataset type")
     
-assert args.model in ['VGG8', 'DenseNet40', 'ResNet18', 'ResNet20','MobileNetV1','MobileNetV2','DSnet'], args.model
+assert args.model in ['VGG8', 'DenseNet40', 'ResNet18', 'ResNet20','MobileNetV1','MobileNetV2','DSnet','DSCnet','FuseNet'], args.model
 if args.model == 'VGG8':
     from models import VGG
     model_path = './log/VGG8.pth'   # WAGE mode pretrained model
@@ -116,15 +116,30 @@ elif args.model == 'ResNet20':
     print(f'__________________________Trainable Number of parameters:{trainable_num_params}')
 elif args.model == 'DSnet':
     from models import DSnet
-    model_path = '/home/zyguan/Inference_pytorch/DS_1/ADCprecision=5/batch_size=128/cellBit=4/dataset=cifar10/decreasing_lr=140,180/detect=0/grad_scale=8/inference=0/lr=0.01/mode=FP/model=DSnet/onoffratio=10/seed=117/subArray=128/t=0/target=0/v=0/vari=0/wl_activate=8/wl_error=8/wl_grad=8/wl_weight=8/best-39.pth'
+    # model_path = '/home/zyguan/Inference_pytorch/DS_1/ADCprecision=5/batch_size=128/cellBit=4/dataset=cifar10/decreasing_lr=140,180/detect=0/grad_scale=8/inference=0/lr=0.01/mode=FP/model=DSnet/onoffratio=10/seed=117/subArray=128/t=0/target=0/v=0/vari=0/wl_activate=8/wl_error=8/wl_grad=8/wl_weight=8/best-39.pth'
+    model_path = './pretrained_models/dsnet_7layers_repVGG.pth'
     modelCF = DSnet.MobileNetV1(class_num=10,args=args,logger=logger,pretrained=model_path)
     print(modelCF)
+elif args.model == 'FuseNet':
+    from models import FuseNet
+    # model = FuseNet.MobileNetV1FuSeFull(num_classes=10, args= args, logger=logger)
+    model_path = './pretrained_models/fuse_half_1ayers.pth'
+    # modelCF = FuseNet.MobileNetV1FuSeFull(num_classes=10, args= args, logger=logger,pretrained=model_path)
+    modelCF = FuseNet.MobileNetV1FuSeHalf(num_classes=10, args= args, logger=logger,pretrained=model_path)
+    print(modelCF)
+elif args.model == 'DSCnet':
+    from models import DSCnet
+    # model_path = '/home/zyguan/Inference_pytorch/DS_1/ADCprecision=5/batch_size=128/cellBit=4/dataset=cifar10/decreasing_lr=140,180/detect=0/grad_scale=8/inference=0/lr=0.01/mode=FP/model=DSnet/onoffratio=10/seed=117/subArray=128/t=0/target=0/v=0/vari=0/wl_activate=8/wl_error=8/wl_grad=8/wl_weight=8/best-39.pth'
+    model_path = './pretrained_models/DSC_12dw.pth'
+    modelCF = DSCnet.MobileNetV1(class_num=10,args=args,logger=logger,pretrained=model_path)
+    print(modelCF)
 elif args.model == 'MobileNetV1':
-
     from models import mobilenetv1
     # model_path = './pretrained_models/mbv1_pretrained_439.pth'
     # model_path = './log/mbv1.pth'
-    model_path = './pretrained_models/mbv1_200epoch.pth'
+    # model_path = './pretrained_models/mbv1_300epoch.pth'
+    # model_path = './pretrained_models/mbv_conv_FP.pth'
+    model_path = './pretrained_models/mbv1_256.pth'
     # model_path = '/home/zyguan/Inference_pytorch/mbv1_fp_log_2/ADCprecision=5/batch_size=128/cellBit=4/dataset=cifar10/decreasing_lr=140,180/detect=0/grad_scale=8/inference=0/lr=0.01/mode=FP/model=MobileNetV1/onoffratio=10/seed=117/subArray=128/t=0/target=0/v=0/vari=0/wl_activate=8/wl_error=8/wl_grad=8/wl_weight=8/best-442.pth'
     # model_path = './pretrained_models/BestModel93.56.t7'
     net_name = args.model

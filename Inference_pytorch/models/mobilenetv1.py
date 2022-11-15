@@ -129,8 +129,9 @@ class MobileNet(nn.Module):
         self.bn1 = nn.BatchNorm2d(32)
         self.layers = self._make_layers(block, in_planes=32, args=args, logger=logger)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.conv2 = Conv2d(1024,256,3, stride=1,padding=1,args=args, logger=logger)
         # self.avgpool = nn.AvgPool2d(kernel_size=2)
-        self.linear = Linear(1024, num_classes, args=args, logger=logger)
+        self.linear = Linear(256, num_classes, args=args, logger=logger)
 
     def _make_layers(self,block, in_planes, args, logger):
         layers = []
@@ -145,10 +146,12 @@ class MobileNet(nn.Module):
         out = F.relu(self.bn1(self.conv1(x)))
         # print('^^^^^^^^^^^before the  layers mbv1 is ', out.shape)
         out = self.layers(out)
+        out = self.conv2(out)
         # print('######the layer shape are',out.shape)
         # print('**********************before the  avg pool2d is ', out.shape)
         # out = F.avg_pool2d(out, 2)
         out = self.avgpool(out)
+
         # print('avg pool is ',self.avgpool(out).shape)
         # print('____________________________after avg pool2d is ',out.shape)
         out = out.view(out.size(0), -1)
@@ -166,7 +169,7 @@ def test():
 def MobileNetV1(num_classes=10, args=None, logger=None, pretrained=None):
     model = MobileNet(Block,num_classes, args=args, logger=logger)
     if pretrained is not None:
-        state_dict = torch.load(pretrained)["net"]
+        state_dict = torch.load(pretrained)
         new_state_dict = {}
         for k, v in state_dict.items():
             new_state_dict[k[7:]] = v
